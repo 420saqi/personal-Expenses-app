@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../model-class.dart';
+import 'package:personalexpenses/Widgets/floating_button_functionality.dart';
+import './Models/model-class.dart';
+
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
@@ -13,10 +15,12 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
+
 class _HomeScreenState extends State<HomeScreen> {
   final transactions = [];
   DateTime currentDate = DateTime.now();
@@ -27,8 +31,17 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
   }
 
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+  void _addNewTransaction(String title, dynamic Myamount) {
+    final tx = Transaction(
+      title: title,
+      amount: Myamount,
+      dateTime: formattedDate,
+    );
+    setState(() {
+      transactions.add(tx);
+    });
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,74 +50,38 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Personal Expenses'),
         backgroundColor: Colors.blue,
       ),
-      body: ListView(children: [
-        Column(
-          children: [
-            TextField(
-              controller: titleController,
-              decoration: const InputDecoration(
-                hintText: 'Enter Title',
+      body: ListView.builder(
+        itemCount: transactions.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: ListTile(
+              leading: CircleAvatar(
+                radius: 25,
+                child: Text(transactions[index].amount.toString()),
               ),
-            ),
-            TextField(
-              controller: amountController,
-              decoration: const InputDecoration(
-                hintText: 'Enter amount',
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  transactions.add(
-                    Transaction(
-                      title: titleController.text,
-                      amount: double.parse(amountController.text),
-                      dateTime: formattedDate,
-                    ),
-                  );
-                });
-              },
-              child: const Text(
-                'Add transaction',
-                style: TextStyle(color: Colors.blue),
-              ),
-            ),
-            ...transactions.map((e) {
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(
-                    radius: 25,
-                    child: Text(e.amount.toString()),
-                  ),
-                  title: Text(e.title),
-                  subtitle: Text(e.dateTime),
-                  trailing: IconButton(
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.blue,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        transactions.remove(e);
-                      });
-                    },
-                  ),
+              title: Text(transactions[index].title),
+              subtitle: Text(transactions[index].dateTime),
+              trailing: IconButton(
+                icon: const Icon(
+                  Icons.delete,
+                  color: Colors.blue,
                 ),
-              );
-            })
-          ],
-        ),
-      ]),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {},
-        backgroundColor: Colors.amber,
-        child: const Icon(
-          Icons.add,
-          color: Colors.black,
-        ),
+                onPressed: () {
+                  setState(() {
+                    transactions.remove(transactions[index]);
+                  });
+                },
+              ),
+            ),
+          );
+        },
+      ),
+      floatingActionButton: FloatingButtonFunctionality(
+        userTransactionList: transactions,
+        newUserTransaction: _addNewTransaction,
+        formattedDate: formattedDate,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
-
