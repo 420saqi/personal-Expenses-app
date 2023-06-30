@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:personalexpenses/Widgets/floating_button_functionality.dart';
@@ -12,36 +13,48 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: HomeScreen(),
+      theme: ThemeData(
+        textTheme: Theme.of(context).textTheme.copyWith(titleLarge:
+        const TextStyle(
+          fontFamily: 'Geologiia_bold',
+        )),
+          appBarTheme: const AppBarTheme(
+        titleTextStyle: TextStyle(
+          fontFamily: 'Geologiia_bold',
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
+      )),
     );
   }
 }
-
 class HomeScreen extends StatefulWidget {
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
-
 class _HomeScreenState extends State<HomeScreen> {
   final transactions = [];
   DateTime currentDate = DateTime.now();
-  late String formattedDate;
+  late dynamic formattedDate; //changed type from String to dynamic because
+  // i changed it in the model class from String to DateTime;
   @override
   void initState() {
     formattedDate = DateFormat('yyyy-MM-dd').format(currentDate);
     super.initState();
   }
-
-  void _addNewTransaction(String title, dynamic Myamount) {
+  void _addNewTransaction(String title, dynamic getamount) {
     final tx = Transaction(
       title: title,
-      amount: Myamount,
-      dateTime: formattedDate,
+      amount: getamount,
+      dateTime:currentDate,
     );
     setState(() {
       transactions.add(tx);
     });
     Navigator.pop(context);
   }
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -57,10 +70,12 @@ class _HomeScreenState extends State<HomeScreen> {
             child: ListTile(
               leading: CircleAvatar(
                 radius: 25,
-                child: Text(transactions[index].amount.toString()),
+                //toStringAsFixed round Off the value to 1 decimal places.
+                child: Text(transactions[index].amount.toStringAsFixed(1)),
               ),
-              title: Text(transactions[index].title),
-              subtitle: Text(transactions[index].dateTime),
+              title: Text(transactions[index].title,
+              style: Theme.of(context).textTheme.titleLarge,),
+              subtitle: Text(transactions[index].dateTime.toString()),
               trailing: IconButton(
                 icon: const Icon(
                   Icons.delete,
@@ -81,7 +96,7 @@ class _HomeScreenState extends State<HomeScreen> {
         newUserTransaction: _addNewTransaction,
         formattedDate: formattedDate,
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

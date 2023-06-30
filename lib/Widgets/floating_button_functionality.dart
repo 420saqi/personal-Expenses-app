@@ -32,12 +32,20 @@ class FloatingButtonFunctionality extends StatelessWidget {
                 child: Column(
                   children: [
                     TextField(
+                      onSubmitted: (value)=> newUserTransaction(
+                        titleController.text,
+                        double.parse(amountController.text),
+                      ),
                       controller: titleController,
                       decoration: const InputDecoration(
                         hintText: 'Enter title',
                       ),
                     ),
                     TextField(
+                      onSubmitted: (value)=>newUserTransaction(
+                        titleController.text,
+                        double.parse(amountController.text),
+                      ) ,
                       keyboardType: TextInputType.number,
                       controller: amountController,
                       decoration: const InputDecoration(
