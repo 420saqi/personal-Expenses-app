@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:personalexpenses/Widgets/chart.dart';
 import 'package:personalexpenses/Widgets/floating_button_functionality.dart';
 import './Models/model-class.dart';
 
@@ -12,8 +13,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(),
+      home: const HomeScreen(),
       theme: ThemeData(
+
         textTheme: Theme.of(context).textTheme.copyWith(titleLarge:
         const TextStyle(
           fontFamily: 'Geologiia_bold',
@@ -24,11 +26,14 @@ class MyApp extends StatelessWidget {
           fontWeight: FontWeight.bold,
           fontSize: 20,
         ),
-      )),
+      ),
+      ),
     );
   }
 }
 class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -53,8 +58,13 @@ class _HomeScreenState extends State<HomeScreen> {
     });
     Navigator.pop(context);
   }
-
-
+List get _recentTransactions{
+    return transactions.where((tx){
+      return tx.dateTime.isAfter(
+        DateTime.now().subtract(const Duration(days: 7),),
+      );
+    }).toList();
+}
 
   @override
   Widget build(BuildContext context) {
@@ -63,33 +73,41 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Personal Expenses'),
         backgroundColor: Colors.blue,
       ),
-      body: ListView.builder(
-        itemCount: transactions.length,
-        itemBuilder: (context, index) {
-          return Card(
-            child: ListTile(
-              leading: CircleAvatar(
-                radius: 25,
-                //toStringAsFixed round Off the value to 1 decimal places.
-                child: Text(transactions[index].amount.toStringAsFixed(1)),
-              ),
-              title: Text(transactions[index].title,
-              style: Theme.of(context).textTheme.titleLarge,),
-              subtitle: Text(transactions[index].dateTime.toString()),
-              trailing: IconButton(
-                icon: const Icon(
-                  Icons.delete,
-                  color: Colors.blue,
-                ),
-                onPressed: () {
-                  setState(() {
-                    transactions.remove(transactions[index]);
-                  });
-                },
-              ),
+      body: Column(
+        children: [
+          ChartBars(recentTransactions: _recentTransactions),
+          Flexible(
+            child: ListView.builder(
+              itemCount: transactions.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      radius: 25,
+                      //toStringAsFixed round Off the value to 1 decimal places.
+                      child: Text(transactions[index].amount.toStringAsFixed(1)),
+                    ),
+                    title: Text(transactions[index].title,
+                    style: Theme.of(context).textTheme.titleLarge,),
+
+                    subtitle: Text(DateFormat.yMd().format(transactions[index].dateTime)),
+                    trailing: IconButton(
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.blue,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          transactions.remove(transactions[index]);
+                        });
+                      },
+                    ),
+                  ),
+                );
+              },
             ),
-          );
-        },
+          ),
+        ],
       ),
       floatingActionButton: FloatingButtonFunctionality(
         userTransactionList: transactions,
